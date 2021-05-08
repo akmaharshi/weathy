@@ -6,23 +6,23 @@ pipeline {
     stages {
     	stage('Build') 	{
 			steps {
-        		sh 'dotnet build src/weathy.csproj -c release'
+        		sh 'dotnet publish src/weathy.csproj -c release'
 			}
     	}
     	stage('parallel stages') {
     		parallel {
     			stage('Archival') {
-				    steps {
-        				archiveArtifacts 'bin/release/net5.0/publish/*.dll'
-				    }
+	                        steps {
+        	                        archiveArtifacts 'bin/release/net5.0/publish/*.dll'
+		                }
     			}
-                stage('Test cases') {
-                    steps {
-                        sh "dotnet test test/weathy-test.csproj --no-build"
-                        step([$class: 'MSTestPublisher', testResultsFile:"test/bin/Debug/net5.0/Weathy.xml", failOnError: true, keepLongStdio: true])
+                        stage('Test cases') {
+                                steps {
+                                        sh "dotnet test test/weathy-test.csproj --no-build"
+                                        step([$class: 'MSTestPublisher', testResultsFile:"test/bin/Debug/net5.0/Weathy.xml", failOnError: true, keepLongStdio: true])
 				    }
+                        }
                 }
-            }
         }
     }
 
