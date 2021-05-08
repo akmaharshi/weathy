@@ -5,28 +5,41 @@ pipeline {
     }
     stages {
     	stage('Build') 	{
-			steps {
-        		sh 'dotnet publish src/weathy.csproj -c release'
-			}
+                steps {
+                        sh 'dotnet publish src/weathy.csproj -c release'
+                }
     	}
-    	stage('parallel stages') {
-    		parallel {
-    			stage('Archival') {
-	                        steps {
-        	                        archiveArtifacts 'bin/release/net5.0/publish/*.dll'
-		                }
-    			}
-                        stage('Test cases') {
+    	stage('Archival') {
+                steps {
+                        archiveArtifacts 'bin/release/net5.0/publish/*.dll'
+                }
+    	}
+                        /*stage('Test cases') {
                                 steps {
                                         sh "dotnet test test/weathy-test.csproj --no-build"
                                         //step([$class: 'MSTestPublisher', testResultsFile:"test/bin/Debug/net5.0/Weathy.xml", failOnError: true, keepLongStdio: true])
-				        mstest testResultsFile:"**/*.xml", keepLongStdio: true
+				        mstest testResultsFile:"***.xml", keepLongStdio: true
                                 }
-                        }
-                }
+                        }*/
+        stage('Build Image') {
+            steps {
+                sh '''
+                    docker build --no-cache -t weathy-image:latest .
+                    docker tag weathy-image:latest akmaharshi/weathy-image:v${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh '''
+                    docker login --username akmaharshi --password sairam123
+                    docker push akmaharshi/weathy-image:v${BUILD_NUMBER}
+                '''
+            }
         }
     }
-
+    
     post {
         always {
             notify('started')
