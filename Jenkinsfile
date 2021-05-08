@@ -14,14 +14,14 @@ pipeline {
                         archiveArtifacts 'bin/release/net5.0/publish/*.dll'
                 }
     	}
-        stage('Test cases') {
+        /*stage('Test cases') {
                 steps {
                         sh "dotnet test test/weathy-test.csproj"
                         //step([$class: 'MSTestPublisher', testResultsFile:"test/bin/Debug/net5.0/Weathy.xml", failOnError: true, keepLongStdio: true])
                         //mstest testResultsFile:"***.xml", keepLongStdio: true
                         junit 'temporary-junit-reports/*.xml'
                 }
-        }
+        }*/
         stage('Build Image') {
             steps {
                 sh '''
