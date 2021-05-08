@@ -19,8 +19,9 @@ pipeline {
                         stage('Test cases') {
                                 steps {
                                         sh "dotnet test test/weathy-test.csproj --no-build"
-                                        step([$class: 'MSTestPublisher', testResultsFile:"test/bin/Debug/net5.0/Weathy.xml", failOnError: true, keepLongStdio: true])
-				    }
+                                        //step([$class: 'MSTestPublisher', testResultsFile:"test/bin/Debug/net5.0/Weathy.xml", failOnError: true, keepLongStdio: true])
+				        mstest testResultsFile:"**/*.xml", keepLongStdio: true
+                                }
                         }
                 }
         }
