@@ -25,8 +25,8 @@ pipeline {
         stage('Build Image') {
             steps {
                 sh '''
-                    docker build --no-cache -t weathy-image:latest .
-                    docker tag weathy-image:latest akmaharshi/weathy-image:v${BUILD_NUMBER}
+                    docker build --no-cache -t weathy-image:latest src
+                    docker tag weathy-image:latest registry.heroku.com/weathy-image:v${BUILD_NUMBER}
                 '''
             }
         }
@@ -34,8 +34,25 @@ pipeline {
         stage('Push Image') {
             steps {
                 sh '''
-                    docker login --username akmaharshi --password sairam123
-                    docker push akmaharshi/weathy-image:v${BUILD_NUMBER}
+                    heroku container:login
+                    docker push registry.heroku.com/weathy-image:v${BUILD_NUMBER}
+                '''
+            }
+        }
+        stage('Deploy in Heroku') {
+            steps {
+                sh '''
+                    heroku container:login
+                    heroku container:release web --app weathy-app
+                    docker-compose up -d
+                '''
+            }
+        }
+        stage('Test the deployment') {
+            steps {
+                sh '''
+                    curl -X 'GET' 'http://localhost:5200/api/v1/weather'
+                    curl -X 'GET' 'http://localhost:5000/api/v2/weather?city=london'
                 '''
             }
         }
